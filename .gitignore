@@ -9,6 +9,7 @@ src/content/generated/
 
 # Local-only artifacts
 extra/
+publish/
 .figma-make-export/
 *.zip
 
