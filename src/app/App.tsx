@@ -18,7 +18,7 @@ import {
   Moon,
   Sun,
 } from "lucide-react";
-import writingsData from "../content/writings.json";
+import writingsData from "../content/generated/writings.json";
 
 type Tag = string;
 type ThemeMode = "light" | "dark";
@@ -129,6 +129,15 @@ function Divider() {
   return <div className="h-px w-full bg-white/[0.06]" />;
 }
 
+function LogoMark() {
+  return (
+    <span className="site-logo-mark" aria-hidden="true">
+      <span className="site-logo-text">SF</span>
+      <span className="site-logo-dot" />
+    </span>
+  );
+}
+
 function Header({
   route,
   navigate,
@@ -143,7 +152,6 @@ function Header({
   const [open, setOpen] = useState(false);
 
   const pages = [
-    { label: "Home", path: "/" },
     { label: "About", path: "/about/" },
     { label: "Writings", path: "/writings/" },
   ];
@@ -166,39 +174,42 @@ function Header({
   return (
     <header className="sticky top-0 z-50 border-b border-white/[0.05] bg-[#09090b]/85 backdrop-blur-xl">
       <div className="max-w-[1240px] mx-auto px-5 sm:px-8 lg:px-10 h-14 flex items-center justify-between">
-        <nav
+        <div className="flex items-center gap-3">
+          <a
+            href={hrefFor("/")}
+            onClick={internalClick("/")}
+            className="group rounded-xl outline-none transition-transform hover:-translate-y-px focus-visible:ring-2 focus-visible:ring-blue-500/45"
+            aria-label="Home"
+            title="Home"
+          >
+            <LogoMark />
+          </a>
+
+          <nav
+            className="hidden md:flex items-center gap-1 rounded-full border border-white/[0.07] bg-white/[0.035] p-1"
+            aria-label="Primary navigation"
+          >
+            {pages.map(({ label, path }) => (
+              <a
+                key={path}
+                href={hrefFor(path)}
+                onClick={internalClick(path)}
+                className={`px-3.5 py-1.5 rounded-full text-sm transition-colors ${
+                  isActive(path)
+                    ? "text-white bg-white/[0.08]"
+                    : "text-zinc-500 hover:text-zinc-200 hover:bg-white/[0.045]"
+                }`}
+              >
+                {label}
+              </a>
+            ))}
+          </nav>
+        </div>
+
+        <div
           className="hidden md:flex items-center gap-1 rounded-full border border-white/[0.07] bg-white/[0.035] p-1"
-          aria-label="Primary navigation"
+          aria-label="Contact and theme"
         >
-          {pages.map(({ label, path }) => (
-            <a
-              key={path}
-              href={hrefFor(path)}
-              onClick={internalClick(path)}
-              className={`px-3.5 py-1.5 rounded-full text-sm transition-colors ${
-                isActive(path)
-                  ? "text-white bg-white/[0.08]"
-                  : "text-zinc-500 hover:text-zinc-200 hover:bg-white/[0.045]"
-              }`}
-            >
-              {label}
-            </a>
-          ))}
-        </nav>
-
-        <a
-          href={hrefFor("/")}
-          onClick={internalClick("/")}
-          className={`md:hidden px-3.5 py-1.5 rounded-full border border-white/[0.07] bg-white/[0.035] text-sm transition-colors ${
-            route.kind === "home"
-              ? "text-white"
-              : "text-zinc-400 hover:text-zinc-200"
-          }`}
-        >
-          Home
-        </a>
-
-        <div className="hidden md:flex items-center gap-1 rounded-full border border-white/[0.07] bg-white/[0.035] p-1">
           <a
             href={`mailto:${CONTACT.email}`}
             aria-label="Email"

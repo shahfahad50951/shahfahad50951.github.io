@@ -188,6 +188,57 @@
   --tw-ring-color: var(--site-panel-strong) !important;
 }
 
+.site-logo-mark {
+  align-items: center;
+  background: linear-gradient(180deg, #111113, #09090b);
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 0.75rem;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.08),
+    0 10px 24px rgb(0 0 0 / 0.24);
+  color: rgb(244 244 245);
+  display: inline-flex;
+  height: 2.25rem;
+  justify-content: center;
+  position: relative;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease;
+  width: 2.25rem;
+}
+
+.site-logo-text {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.site-logo-dot {
+  background: rgb(96 165 250);
+  border-radius: 999px;
+  bottom: 0.38rem;
+  height: 0.34rem;
+  position: absolute;
+  right: 0.38rem;
+  width: 0.34rem;
+}
+
+.site-shell.theme-light .site-logo-mark {
+  background: linear-gradient(180deg, rgb(255 255 255), rgb(241 243 245));
+  border-color: rgb(24 24 27 / 0.16);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.95),
+    0 8px 22px rgb(24 24 27 / 0.08);
+  color: rgb(24 24 27);
+}
+
+.site-shell.theme-light .site-logo-dot {
+  background: rgb(37 99 235);
+}
+
 .article-body {
   color: rgb(161 161 170);
   text-wrap: pretty;
@@ -292,10 +343,12 @@
 }
 
 .article-body .highlight {
-  border: 1px solid rgb(255 255 255 / 0.09);
+  border: 1px solid rgb(255 255 255 / 0.14);
   border-radius: 0.75rem;
-  background: #0b0b0d;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.03);
+  background: linear-gradient(180deg, rgb(18 18 21 / 0.98), rgb(9 9 11 / 0.98));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.06),
+    0 16px 45px rgb(0 0 0 / 0.22);
   margin: 1.7rem 0;
   overflow-x: auto;
   overflow-y: hidden;
@@ -304,32 +357,81 @@
 }
 
 .article-body pre {
-  margin: 0;
-  overflow: visible;
+  border: 1px solid rgb(255 255 255 / 0.14);
+  border-left-color: rgb(96 165 250 / 0.42);
+  border-left-width: 3px;
+  border-radius: 0.75rem;
+  margin: 1.7rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
   padding: 1.15rem 1.25rem;
-  background: #0b0b0d;
+  background: linear-gradient(180deg, rgb(18 18 21 / 0.98), rgb(9 9 11 / 0.98));
   color: rgb(180 180 188);
   font-family: "JetBrains Mono", monospace;
   font-size: 0.79rem;
   line-height: 1.75;
   max-width: none;
   min-width: 100%;
-  width: max-content;
+  width: 100%;
   white-space: pre;
   word-break: normal;
   overflow-wrap: normal;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.06),
+    0 16px 45px rgb(0 0 0 / 0.22);
+  scrollbar-color: rgb(63 63 70) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.article-body .highlight pre {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  margin: 0;
 }
 
 .article-body pre code {
   border: 0;
   border-radius: 0;
   background: transparent;
+  display: inline-block;
   color: inherit;
   font-size: inherit;
+  min-width: max-content;
   padding: 0;
   white-space: pre;
   word-break: normal;
   overflow-wrap: normal;
+}
+
+.article-body pre::-webkit-scrollbar,
+.article-body .highlight::-webkit-scrollbar,
+.article-body .table-wrapper-paragraph::-webkit-scrollbar,
+.article-body figure.wide::-webkit-scrollbar,
+.article-body .wide-figure::-webkit-scrollbar,
+.article-body .diagram-scroll::-webkit-scrollbar {
+  height: 0.65rem;
+}
+
+.article-body pre::-webkit-scrollbar-thumb,
+.article-body .highlight::-webkit-scrollbar-thumb,
+.article-body .table-wrapper-paragraph::-webkit-scrollbar-thumb,
+.article-body figure.wide::-webkit-scrollbar-thumb,
+.article-body .wide-figure::-webkit-scrollbar-thumb,
+.article-body .diagram-scroll::-webkit-scrollbar-thumb {
+  background: rgb(82 82 91 / 0.82);
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: content-box;
+}
+
+.article-body pre::-webkit-scrollbar-track,
+.article-body .highlight::-webkit-scrollbar-track,
+.article-body .table-wrapper-paragraph::-webkit-scrollbar-track,
+.article-body figure.wide::-webkit-scrollbar-track,
+.article-body .wide-figure::-webkit-scrollbar-track,
+.article-body .diagram-scroll::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .article-body .table-wrapper-paragraph {
@@ -466,20 +568,39 @@
 }
 
 .site-shell.theme-light .article-body .highlight {
-  border-color: var(--site-border);
-  background: var(--site-code-bg);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.65);
+  border-color: rgb(24 24 27 / 0.18);
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.94), rgb(241 243 245 / 0.96));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.9),
+    0 14px 34px rgb(24 24 27 / 0.08);
   scrollbar-color: rgb(161 161 170) transparent;
 }
 
 .site-shell.theme-light .article-body pre {
-  background: var(--site-code-bg);
+  border-color: rgb(24 24 27 / 0.18);
+  border-left-color: rgb(37 99 235 / 0.45);
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.94), rgb(241 243 245 / 0.96));
   color: rgb(63 63 70);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.9),
+    0 14px 34px rgb(24 24 27 / 0.08);
+  scrollbar-color: rgb(161 161 170) transparent;
 }
 
 .site-shell.theme-light .article-body pre code {
   background: transparent;
   color: inherit;
+}
+
+.site-shell.theme-light .article-body pre::-webkit-scrollbar-thumb,
+.site-shell.theme-light .article-body .highlight::-webkit-scrollbar-thumb,
+.site-shell.theme-light .article-body .table-wrapper-paragraph::-webkit-scrollbar-thumb,
+.site-shell.theme-light .article-body figure.wide::-webkit-scrollbar-thumb,
+.site-shell.theme-light .article-body .wide-figure::-webkit-scrollbar-thumb,
+.site-shell.theme-light .article-body .diagram-scroll::-webkit-scrollbar-thumb {
+  background: rgb(161 161 170 / 0.86);
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
 
 .site-shell.theme-light .article-body .table-wrapper-paragraph {

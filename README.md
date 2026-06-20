@@ -40,13 +40,15 @@ npm install
 npm run dev
 ```
 
+`npm run dev` generates article data from Markdown before starting Vite.
+
 ## Production Build
 
 ```bash
 npm run build
 ```
 
-The build outputs static files to `dist/`. The post-build script creates static
+The build generates article data, outputs static files to `dist/`, and creates
 route folders so direct GitHub Pages URLs work for nested routes.
 
 ## Deployment
@@ -65,9 +67,56 @@ deploys it to GitHub Pages.
 ## Content
 
 - Main site copy and layout: `src/app/App.tsx`
-- Article content: `src/content/writings.json`
+- Article content: `src/content/writings/*/index.md`
 - Article styling: `src/styles/globals.css`
+- Article data generation: `scripts/generate-content.mjs`
 - Static route generation: `scripts/create-static-routes.mjs`
+
+### Adding a Writing
+
+Create a new folder under `src/content/writings/`. The folder name becomes the
+public URL slug.
+
+```text
+src/content/writings/cuda-memory-coalescing/
+  index.md
+  images/
+    warp-layout.png
+```
+
+Add frontmatter to `index.md`:
+
+```md
+---
+title: "CUDA Memory Coalescing Notes"
+description: "A practical note on global memory access patterns."
+date: "2026-06-20"
+tags: ["CUDA", "GPU", "Performance"]
+draft: false
+---
+
+Write the article here.
+```
+
+The site automatically updates recent writings, article counts, tag filters,
+year grouping, reading time, table of contents, routes, and previous/next links.
+
+Use local images like this:
+
+```md
+![Warp memory layout](./images/warp-layout.png)
+```
+
+For wide diagrams:
+
+```html
+<figure class="wide">
+  <img src="./images/warp-layout.png" alt="Warp memory layout" />
+  <figcaption>Warp-level memory layout.</figcaption>
+</figure>
+```
+
+Draft articles are ignored when `draft: true`.
 
 ## Notes
 
@@ -76,3 +125,5 @@ Generated output and local-only artifacts are intentionally ignored:
 - `dist/`
 - `node_modules/`
 - `extra/`
+- `public/writings/`
+- `src/content/generated/`
