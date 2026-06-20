@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Local-only artifacts
+extra/
+.figma-make-export/
+*.zip
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Tool caches
+.vite/
+.cache/
+.turbo/
+.parcel-cache/
+.eslintcache
+*.tsbuildinfo
+
+# Test / coverage output
+coverage/
+.nyc_output/
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
