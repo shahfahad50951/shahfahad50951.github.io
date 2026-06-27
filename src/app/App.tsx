@@ -1,6 +1,7 @@
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
   type MouseEvent,
 } from "react";
@@ -17,6 +18,7 @@ import {
   Calendar,
   Moon,
   Sun,
+  Github,
 } from "lucide-react";
 import writingsData from "../content/generated/writings.json";
 
@@ -32,6 +34,7 @@ type Route =
 interface TocItem {
   id: string;
   title: string;
+  level: number;
 }
 
 interface Writing {
@@ -52,6 +55,8 @@ const BASE_PREFIX =
 
 const CONTACT = {
   email: "shahfahad.50951@gmail.com",
+  githubLabel: "github.com/shahfahad50951",
+  githubUrl: "https://github.com/shahfahad50951",
   linkedInLabel: "linkedin.com/in/shahfahad50951",
   linkedInUrl: "https://www.linkedin.com/in/shahfahad50951",
   location: "Bengaluru, India",
@@ -116,7 +121,7 @@ function Chip({ label, active = false }: { label: string; active?: boolean }) {
     <span
       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium transition-colors ${
         active
-          ? "bg-blue-500/15 text-blue-400 ring-1 ring-blue-500/20"
+          ? "bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/20"
           : "bg-zinc-800/80 text-zinc-400 ring-1 ring-white/[0.06]"
       }`}
     >
@@ -132,8 +137,7 @@ function Divider() {
 function LogoMark() {
   return (
     <span className="site-logo-mark" aria-hidden="true">
-      <span className="site-logo-text">SF</span>
-      <span className="site-logo-dot" />
+      <img src={hrefFor("/logo.svg")} alt="" />
     </span>
   );
 }
@@ -172,13 +176,13 @@ function Header({
   const ThemeIcon = theme === "dark" ? Sun : Moon;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/[0.05] bg-[#09090b]/85 backdrop-blur-xl">
+    <header className="site-header sticky top-0 z-50 border-b border-white/[0.05] bg-[#09090b]/85 backdrop-blur-xl">
       <div className="max-w-[1240px] mx-auto px-5 sm:px-8 lg:px-10 h-14 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <a
             href={hrefFor("/")}
             onClick={internalClick("/")}
-            className="group rounded-xl outline-none transition-transform hover:-translate-y-px focus-visible:ring-2 focus-visible:ring-blue-500/45"
+            className="group rounded-xl outline-none transition-transform hover:-translate-y-px focus-visible:ring-2 focus-visible:ring-amber-500/45"
             aria-label="Home"
             title="Home"
           >
@@ -186,7 +190,7 @@ function Header({
           </a>
 
           <nav
-            className="hidden md:flex items-center gap-1 rounded-full border border-white/[0.07] bg-white/[0.035] p-1"
+            className="site-nav-group hidden md:flex items-center gap-1 rounded-full border border-white/[0.07] bg-white/[0.035] p-1"
             aria-label="Primary navigation"
           >
             {pages.map(({ label, path }) => (
@@ -196,7 +200,7 @@ function Header({
                 onClick={internalClick(path)}
                 className={`px-3.5 py-1.5 rounded-full text-sm transition-colors ${
                   isActive(path)
-                    ? "text-white bg-white/[0.08]"
+                    ? "site-nav-active text-white bg-white/[0.08]"
                     : "text-zinc-500 hover:text-zinc-200 hover:bg-white/[0.045]"
                 }`}
               >
@@ -207,7 +211,7 @@ function Header({
         </div>
 
         <div
-          className="hidden md:flex items-center gap-1 rounded-full border border-white/[0.07] bg-white/[0.035] p-1"
+          className="site-nav-group hidden md:flex items-center gap-1 rounded-full border border-white/[0.07] bg-white/[0.035] p-1"
           aria-label="Contact and theme"
         >
           <a
@@ -226,6 +230,15 @@ function Header({
           >
             <Linkedin size={15} />
           </a>
+          <a
+            href={CONTACT.githubUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub"
+            className="p-2 rounded-full text-zinc-500 hover:text-zinc-200 hover:bg-white/[0.045] transition-colors"
+          >
+            <Github size={15} />
+          </a>
           <button
             onClick={toggleTheme}
             className="p-2 rounded-full text-zinc-500 hover:text-zinc-200 hover:bg-white/[0.045] transition-colors"
@@ -240,7 +253,7 @@ function Header({
         <div className="md:hidden flex items-center gap-2">
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-full border border-white/[0.07] bg-white/[0.035] text-zinc-500 hover:text-zinc-200 transition-colors"
+            className="site-nav-group p-2 rounded-full border border-white/[0.07] bg-white/[0.035] text-zinc-500 hover:text-zinc-200 transition-colors"
             aria-label={themeLabel}
             title={themeLabel}
             type="button"
@@ -250,7 +263,7 @@ function Header({
 
           <button
             onClick={() => setOpen(!open)}
-            className="p-2 rounded-full border border-white/[0.07] bg-white/[0.035] text-zinc-500 hover:text-zinc-200 transition-colors"
+            className="site-nav-group p-2 rounded-full border border-white/[0.07] bg-white/[0.035] text-zinc-500 hover:text-zinc-200 transition-colors"
             aria-label="Toggle menu"
             type="button"
           >
@@ -269,7 +282,7 @@ function Header({
                 onClick={internalClick(path)}
                 className={`block w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                   isActive(path)
-                    ? "text-white bg-white/[0.08]"
+                    ? "site-nav-active text-white bg-white/[0.08]"
                     : "text-zinc-400 hover:text-zinc-200"
                 }`}
               >
@@ -292,6 +305,15 @@ function Header({
                 className="p-2 rounded-md text-zinc-500 hover:text-zinc-200 transition-colors"
               >
                 <Linkedin size={16} />
+              </a>
+              <a
+                href={CONTACT.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="GitHub"
+                className="p-2 rounded-md text-zinc-500 hover:text-zinc-200 transition-colors"
+              >
+                <Github size={16} />
               </a>
             </div>
           </div>
@@ -321,7 +343,7 @@ function WritingCard({
       <a
         href={hrefFor(path)}
         onClick={onClick}
-        className="group block w-full text-left rounded-xl border border-white/[0.06] bg-zinc-900/40 hover:bg-zinc-900/80 hover:border-white/[0.10] px-5 py-4 transition-all duration-200"
+        className="site-card site-card-interactive group block w-full text-left rounded-xl border border-white/[0.06] bg-zinc-900/40 hover:bg-zinc-900/80 hover:border-white/[0.10] px-5 py-4 transition-all duration-200"
       >
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
@@ -336,7 +358,7 @@ function WritingCard({
           </div>
           <ArrowUpRight
             size={14}
-            className="text-zinc-600 group-hover:text-blue-400 transition-colors flex-shrink-0 mt-0.5"
+            className="text-zinc-600 group-hover:text-amber-400 transition-colors flex-shrink-0 mt-0.5"
           />
         </div>
       </a>
@@ -376,10 +398,10 @@ function WritingCard({
 
       <div className="hidden md:flex justify-end">
         <div className="flex-shrink-0 mt-0.5">
-          <div className="w-7 h-7 rounded-full flex items-center justify-center bg-zinc-800/60 group-hover:bg-blue-500/15 border border-white/[0.06] group-hover:border-blue-500/20 transition-all duration-200">
+          <div className="w-7 h-7 rounded-full flex items-center justify-center bg-zinc-800/60 group-hover:bg-amber-500/15 border border-white/[0.06] group-hover:border-amber-500/20 transition-all duration-200">
             <ArrowRight
               size={13}
-              className="text-zinc-500 group-hover:text-blue-400 transition-colors"
+              className="text-zinc-500 group-hover:text-amber-400 transition-colors"
             />
           </div>
         </div>
@@ -389,111 +411,148 @@ function WritingCard({
 }
 
 function HomePage({ navigate }: { navigate: (path: string) => void }) {
+  const latestWriting = writings[0];
+  const featuredImage =
+    latestWriting?.slug === "cute-layouts"
+      ? hrefFor(`/writings/${latestWriting.slug}/images/svg/00_layout_mental_model.svg`)
+      : null;
+
   return (
     <main className="max-w-[1240px] mx-auto px-5 sm:px-8 lg:px-10">
-      <section className="pt-16 pb-14">
-        <div className="grid lg:grid-cols-[minmax(0,1fr)_360px] gap-12 lg:gap-20 items-center">
-          <div className="max-w-[760px]">
-            <div className="inline-flex items-center gap-2 rounded-full bg-blue-500/10 border border-blue-500/20 px-3 py-1 mb-8">
-              <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-              <span className="text-xs text-blue-400 font-medium">
-                Deep Learning Performance Engineer II
-              </span>
-            </div>
+      <section className="pt-14 pb-16 sm:pt-18">
+        <div className="grid lg:grid-cols-[minmax(0,1fr)_430px] gap-10 lg:gap-16 items-start">
+          <div className="max-w-[780px]">
+            <p className="text-sm text-amber-400 font-medium mb-5">
+              Shah Fahad / GPU Systems & LLM Performance
+            </p>
 
-            <h1 className="font-['Bricolage_Grotesque',sans-serif] text-[2.8rem] sm:text-[3.75rem] font-semibold leading-[1.05] tracking-tight text-white mb-6">
-              Shah Fahad
+            <h1 className="font-['Bricolage_Grotesque',sans-serif] text-[2.75rem] sm:text-[4.4rem] font-semibold leading-[0.98] tracking-tight text-white mb-7">
+              Performance notes from the CUDA and LLM systems edge.
             </h1>
 
-            <p className="text-lg text-zinc-400 leading-relaxed mb-4">
-              Deep Learning Performance Engineer II at NVIDIA, focused on
-              benchmarking, profiling, and optimizing LLM workloads across
-              modern datacenter GPU systems, primarily for inference and also
-              for training.
+            <p className="text-lg text-zinc-400 leading-relaxed mb-5 max-w-[720px]">
+              I am a Deep Learning Performance Engineer II at NVIDIA, working
+              on benchmarking, profiling, and optimizing modern datacenter GPU
+              workloads, primarily LLM inference and also training.
             </p>
 
             <p className="text-sm text-zinc-600 leading-[1.85] mb-9 max-w-[700px]">
-              My work spans silicon-to-simulator performance correlation for
-              LLM workloads, kernel-level analysis with Nsight Systems and
-              Nsight Compute, C/C++ and Python benchmarking infrastructure, and
-              optimization work across PyTorch, TensorRT-LLM, NeMo, CUDA
-              kernels, and HPC clusters.
+              This site collects the practical side of that work: CUDA kernels,
+              Nsight traces, memory behavior, TensorRT-LLM, CuTe/CUTLASS,
+              cluster benchmarking, simulator correlation, and debugging notes
+              that are useful after the immediate problem is gone.
             </p>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3 mb-10">
               <a
-                href={CONTACT.linkedInUrl}
+                href={hrefFor("/writings/")}
+                onClick={(event) => {
+                  event.preventDefault();
+                  navigate("/writings/");
+                }}
+                className="site-primary-action inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition-all duration-150"
+              >
+                Read writings
+                <ArrowRight size={15} />
+              </a>
+              <a
+                href={hrefFor("/about/")}
+                onClick={(event) => {
+                  event.preventDefault();
+                  navigate("/about/");
+                }}
+                className="site-secondary-action inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-all duration-150"
+              >
+                About
+              </a>
+              <a
+                href={CONTACT.githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg bg-white/[0.06] border border-white/[0.08] hover:bg-white/[0.09] hover:border-white/[0.13] px-4 py-2.5 text-sm font-medium text-zinc-300 hover:text-white transition-all duration-150"
+                className="site-secondary-action inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-all duration-150"
               >
-                <Linkedin size={15} />
-                LinkedIn
-              </a>
-              <a
-                href={`mailto:${CONTACT.email}`}
-                className="inline-flex items-center gap-2 rounded-lg bg-white/[0.06] border border-white/[0.08] hover:bg-white/[0.09] hover:border-white/[0.13] px-4 py-2.5 text-sm font-medium text-zinc-300 hover:text-white transition-all duration-150"
-              >
-                <Mail size={15} />
-                Email
+                <Github size={15} />
+                GitHub
               </a>
             </div>
-          </div>
 
-          <aside className="rounded-xl border border-white/[0.06] bg-zinc-900/40 p-5">
-            <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-5">
-              Currently
-            </h2>
-            <div className="divide-y divide-white/[0.06]">
+            <div className="site-stat-strip grid grid-cols-3 max-w-[620px] rounded-xl border border-white/[0.06] bg-zinc-900/35 divide-x divide-white/[0.06] overflow-hidden">
               {[
-                {
-                  label: "Role",
-                  value: "Deep Learning Performance Engineer II",
-                },
-                {
-                  label: "Work",
-                  value: "LLM inference performance, profiling, benchmarking, and optimization",
-                },
-                {
-                  label: "Systems",
-                  value: "CUDA, TensorRT-LLM, PyTorch, Nsight, Slurm, HPC clusters",
-                },
-                {
-                  label: "Location",
-                  value: CONTACT.location,
-                },
+                { label: "Writings", value: writings.length.toString() },
+                { label: "Topics", value: ALL_TAGS.length.toString() },
+                { label: "Latest", value: "CuTe" },
               ].map((item) => (
-                <div
-                  key={item.label}
-                  className="grid grid-cols-[64px_minmax(0,1fr)] gap-3 py-3 first:pt-0 last:pb-0"
-                >
-                  <span className="text-[11px] uppercase tracking-widest text-zinc-700">
-                    {item.label}
-                  </span>
-                  <span
-                    className={`text-xs text-zinc-400 leading-relaxed ${
-                      item.label === "Role" ? "lg:whitespace-nowrap" : ""
-                    }`}
-                  >
+                <div key={item.label} className="px-4 py-3">
+                  <p className="font-['Bricolage_Grotesque',sans-serif] text-xl font-semibold text-white leading-none">
                     {item.value}
-                  </span>
+                  </p>
+                  <p className="text-[11px] uppercase tracking-widest text-zinc-700 mt-2">
+                    {item.label}
+                  </p>
                 </div>
               ))}
             </div>
-          </aside>
+          </div>
+
+          {latestWriting && (
+            <aside className="site-feature-card rounded-2xl border border-white/[0.07] bg-zinc-900/45 overflow-hidden shadow-[0_24px_70px_rgb(0_0_0_/_0.20)]">
+              {featuredImage && (
+                <div className="aspect-[1.55] border-b border-white/[0.06] bg-white/[0.03] overflow-hidden">
+                  <img
+                    src={featuredImage}
+                    alt=""
+                    className="h-full w-full object-cover object-left-top opacity-95"
+                    loading="eager"
+                  />
+                </div>
+              )}
+
+              <a
+                href={hrefFor(`/writings/${latestWriting.slug}/`)}
+                onClick={(event) => {
+                  event.preventDefault();
+                  navigate(`/writings/${latestWriting.slug}/`);
+                }}
+                className="group block p-5"
+              >
+                <div className="flex items-center justify-between gap-3 mb-4">
+                  <p className="text-xs font-semibold text-zinc-500 uppercase tracking-widest">
+                    Latest writing
+                  </p>
+                  <ArrowUpRight
+                    size={15}
+                    className="text-zinc-600 group-hover:text-amber-400 transition-colors"
+                  />
+                </div>
+
+                <h2 className="text-xl font-semibold text-zinc-100 group-hover:text-white leading-tight mb-3 transition-colors">
+                  {latestWriting.title}
+                </h2>
+                <p className="text-sm text-zinc-500 leading-relaxed mb-5">
+                  {latestWriting.description}
+                </p>
+
+                <div className="flex items-center justify-between gap-4 text-xs text-zinc-600">
+                  <span>{fmtDate(latestWriting.date)}</span>
+                  <span>{latestWriting.readingTime} min read</span>
+                </div>
+              </a>
+            </aside>
+          )}
         </div>
       </section>
 
       <Divider />
 
-      <section className="py-14">
-        <div className="grid lg:grid-cols-[280px_minmax(0,1fr)] gap-8 lg:gap-16 items-start">
+      <section className="py-14 pb-20">
+        <div className="grid lg:grid-cols-[300px_minmax(0,1fr)] gap-8 lg:gap-14 items-start">
           <div>
             <h2 className="text-lg font-semibold text-zinc-100 mb-2">
               Recent Writings
             </h2>
             <p className="text-sm text-zinc-600 leading-relaxed mb-5">
-              Notes on GPU architecture, CUDA, and performance engineering.
+              Deep dives and practical notes from CUDA, GPU architecture, and
+              LLM performance work.
             </p>
             <a
               href={hrefFor("/writings/")}
@@ -501,15 +560,15 @@ function HomePage({ navigate }: { navigate: (path: string) => void }) {
                 event.preventDefault();
                 navigate("/writings/");
               }}
-              className="inline-flex items-center gap-1.5 text-sm text-blue-400 hover:text-blue-300 transition-colors font-medium"
+              className="inline-flex items-center gap-1.5 text-sm text-amber-400 hover:text-amber-300 transition-colors font-medium"
             >
               View all writings
               <ArrowRight size={14} />
             </a>
           </div>
 
-          <div className="rounded-xl border border-white/[0.06] bg-zinc-900/35 overflow-hidden">
-            {writings.slice(0, 3).map((writing) => {
+          <div className="grid md:grid-cols-2 gap-4">
+            {writings.slice(0, 4).map((writing) => {
               const path = `/writings/${writing.slug}/`;
 
               return (
@@ -520,40 +579,36 @@ function HomePage({ navigate }: { navigate: (path: string) => void }) {
                     event.preventDefault();
                     navigate(path);
                   }}
-                  className="group grid md:grid-cols-[140px_minmax(0,1fr)_32px] gap-4 px-5 py-5 border-b border-white/[0.06] last:border-b-0 hover:bg-white/[0.025] transition-colors"
+                  className="site-card site-card-interactive group flex min-h-[220px] flex-col rounded-xl border border-white/[0.06] bg-zinc-900/35 hover:bg-zinc-900/65 hover:border-white/[0.10] p-5 transition-all duration-200"
                 >
-                  <div className="text-xs text-zinc-600 leading-relaxed">
-                    <div className="flex items-center gap-1.5">
+                  <div className="flex items-center justify-between gap-4 text-xs text-zinc-600 mb-5">
+                    <span className="flex items-center gap-1.5">
                       <Calendar size={11} />
                       {fmtDate(writing.date)}
-                    </div>
-                    <div className="flex items-center gap-1.5 mt-1.5">
+                    </span>
+                    <span className="flex items-center gap-1.5">
                       <Clock size={11} />
-                      {writing.readingTime} min read
-                    </div>
+                      {writing.readingTime} min
+                    </span>
                   </div>
 
-                  <div className="min-w-0">
-                    <h3 className="text-[15px] font-semibold text-zinc-200 group-hover:text-white transition-colors leading-snug mb-2">
-                      {writing.title}
-                    </h3>
-                    <p className="text-sm text-zinc-500 leading-relaxed mb-3">
-                      {writing.description}
-                    </p>
+                  <h3 className="text-lg font-semibold text-zinc-200 group-hover:text-white transition-colors leading-tight mb-3">
+                    {writing.title}
+                  </h3>
+                  <p className="text-sm text-zinc-500 leading-relaxed mb-5">
+                    {writing.description}
+                  </p>
+
+                  <div className="mt-auto flex items-end justify-between gap-4">
                     <div className="flex gap-1.5 flex-wrap">
-                      {writing.tags.map((tag) => (
+                      {writing.tags.slice(0, 3).map((tag) => (
                         <Chip key={tag} label={tag} />
                       ))}
                     </div>
-                  </div>
-
-                  <div className="hidden md:flex justify-end">
-                    <div className="w-7 h-7 rounded-full flex items-center justify-center bg-zinc-800/60 group-hover:bg-blue-500/15 border border-white/[0.06] group-hover:border-blue-500/20 transition-all duration-200">
-                      <ArrowRight
-                        size={13}
-                        className="text-zinc-500 group-hover:text-blue-400 transition-colors"
-                      />
-                    </div>
+                    <ArrowRight
+                      size={15}
+                      className="text-zinc-600 group-hover:text-amber-400 transition-colors flex-shrink-0 mb-1"
+                    />
                   </div>
                 </a>
               );
@@ -562,133 +617,97 @@ function HomePage({ navigate }: { navigate: (path: string) => void }) {
         </div>
       </section>
 
-      <Divider />
-
-      <section className="py-14 pb-20">
-        <div className="grid lg:grid-cols-[280px_minmax(0,1fr)] gap-8 lg:gap-16 items-start">
-          <div>
-            <h2 className="text-lg font-semibold text-zinc-100 mb-2">
-              Technical Surface
-            </h2>
-            <p className="text-sm text-zinc-600 leading-relaxed">
-              The areas that usually show up in my work and writing.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-x-10 gap-y-8">
-            {[
-              {
-                title: "Performance Work",
-                topics: [
-                  "LLM Inference Optimization",
-                  "LLM Benchmarking",
-                  "GPU Profiling",
-                  "Silicon Correlation",
-                  "HPC Cluster Runs",
-                ],
-              },
-              {
-                title: "CUDA & Systems",
-                topics: [
-                  "CUDA Kernel Optimization",
-                  "Memory Hierarchy",
-                  "Roofline Model",
-                  "Nsight Compute",
-                  "TensorRT-LLM",
-                ],
-              },
-            ].map((group) => (
-              <div key={group.title}>
-                <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-4">
-                  {group.title}
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {group.topics.map((topic) => (
-                    <span
-                      key={topic}
-                      className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-1.5 text-xs text-zinc-500 hover:text-zinc-300 hover:border-white/[0.10] hover:bg-white/[0.04] transition-all cursor-default"
-                    >
-                      {topic}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
     </main>
   );
 }
 
-function AboutPage() {
+function AboutPage({ navigate }: { navigate: (path: string) => void }) {
   return (
-    <main className="max-w-[1240px] mx-auto px-5 sm:px-8 lg:px-10">
-      <div className="pt-16 pb-24">
-        <div className="grid md:grid-cols-[minmax(0,1fr)_320px] gap-12 lg:gap-24 items-start">
-          <div className="space-y-12">
-            <section className="max-w-[760px]">
-              <p className="text-sm text-blue-400 font-medium mb-3">About</p>
-              <h1 className="font-['Bricolage_Grotesque',sans-serif] text-[2.25rem] sm:text-[2.75rem] font-semibold text-white tracking-tight leading-tight mb-5">
-                Performance work at the boundary of LLM software and GPU
+    <main className="about-page max-w-[1240px] mx-auto px-5 sm:px-8 lg:px-10">
+      <div className="pt-14 pb-24 sm:pt-16">
+        <div className="grid lg:grid-cols-[minmax(0,1fr)_340px] gap-14 lg:gap-16 xl:gap-20 items-start">
+          <div>
+            <section className="about-intro max-w-[780px]">
+              <p className="text-sm text-amber-400 font-medium mb-4">About</p>
+              <h1 className="font-['Bricolage_Grotesque',sans-serif] text-[2.6rem] sm:text-[3.5rem] font-semibold text-white tracking-tight leading-[1.02] mb-6">
+                I&apos;m Shah Fahad. I work on LLM performance across modern GPU
                 systems.
               </h1>
-              <p className="text-base text-zinc-400 leading-[1.8]">
-                I am Shah Fahad, a Deep Learning Performance Engineer II at
-                NVIDIA in Bengaluru. My work focuses on benchmarking, profiling,
-                and optimizing LLM workloads across modern datacenter GPU
-                systems, primarily for inference and also for training.
+              <p className="max-w-[720px] text-[1.05rem] text-zinc-400 leading-[1.8]">
+                I am a Deep Learning Performance Engineer II at NVIDIA in
+                Bengaluru. My work spans benchmarking, profiling, and
+                optimization for modern datacenter GPU workloads, primarily LLM
+                inference and also training.
               </p>
+
+              <div className="mt-8 flex flex-wrap gap-3">
+                <a
+                  href={hrefFor("/writings/")}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    navigate("/writings/");
+                  }}
+                  className="site-primary-action inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition-all duration-150"
+                >
+                  Explore writings
+                  <ArrowRight size={15} />
+                </a>
+                <a
+                  href={`mailto:${CONTACT.email}`}
+                  className="site-secondary-action inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-all duration-150"
+                >
+                  <Mail size={15} />
+                  Email me
+                </a>
+              </div>
             </section>
 
-            {[
-              {
-                title: "What I Work On",
-                paragraphs: [
-                  "I work on the performance side of deep learning systems, where model software, GPU architecture, and large-scale cluster execution meet. The core loop is measurement, explanation, and optimization: understand what the workload is doing, find the limiting behavior, and turn that into a concrete improvement.",
-                  "At NVIDIA, that spans LLM benchmarking, silicon-to-simulator performance correlation for LLM workloads, GPU kernel-level profiling, and infrastructure for repeatable performance analysis across HPC clusters.",
-                ],
-              },
-              {
-                title: "Current Focus",
-                paragraphs: [
-                  "My current focus is LLM inference performance, while also working on training workloads. I look at end-to-end behavior as well as lower-level bottlenecks: CPU launch overhead, kernel execution, memory movement, cluster repeatability, and hardware metric correlation.",
-                  "The day-to-day tooling is a mix of hardware execution metrics, simulator-based projections, Slurm, Docker, Nsight Systems, Nsight Compute, and C/C++ and Python infrastructure.",
-                ],
-              },
-              {
-                title: "Technical Interests",
-                paragraphs: [
-                  "CUDA kernel optimization, memory hierarchy, Tensor Core programming, GPU profiling, LLM serving performance, HPC automation, and systems-level debugging.",
-                  "I also like rebuilding deep learning abstractions from first principles: PyTorch-style operations down to NumPy, C++, CUDA kernels, cuBLAS baselines, and CuTe layout algebra.",
-                ],
-              },
-              {
-                title: "Writing",
-                paragraphs: [
-                  "I use this site for technical notes that are useful beyond a single debugging session: CUDA behavior, GPU performance models, memory semantics, profiling workflows, and LLM inference systems.",
-                ],
-              },
-            ].map((section) => (
-              <section key={section.title}>
-                <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-5">
-                  {section.title}
-                </h2>
-                <div className="space-y-4 text-[15px] text-zinc-400 leading-[1.85]">
-                  {section.paragraphs.map((paragraph) => (
-                    <p key={paragraph}>{paragraph}</p>
-                  ))}
-                </div>
-              </section>
-            ))}
+            <div className="about-story">
+              {[
+                {
+                  title: "At NVIDIA",
+                  paragraphs: [
+                    "I work on benchmarking, profiling, and optimizing LLM workloads on modern datacenter GPUs. My work is primarily centered on inference, while also covering training performance.",
+                    "That includes silicon-to-simulator performance correlation for LLM workloads, kernel-level GPU profiling, and infrastructure for repeatable performance analysis across HPC clusters.",
+                  ],
+                },
+                {
+                  title: "Current Engineering Focus",
+                  paragraphs: [
+                    "I study both end-to-end workload behavior and lower-level bottlenecks such as CPU launch overhead, kernel execution, memory movement, cluster repeatability, and hardware metric correlation.",
+                    "My day-to-day work uses hardware execution metrics, simulator-based projections, Slurm, Docker, Nsight Systems, Nsight Compute, and C/C++ and Python infrastructure.",
+                  ],
+                },
+                {
+                  title: "Technical Writing",
+                  paragraphs: [
+                    "I write about topics I have worked through in depth. The articles currently on this site cover CuTe layouts and layout algebra, the roofline model, Hopper GPU memory consistency, and CUDA Graphs in LLM inference.",
+                    "When learning a system, I often rebuild its abstractions from first principles, moving from NumPy and C++ implementations to CUDA kernels, cuBLAS baselines, and CuTe layout algebra.",
+                  ],
+                },
+              ].map((section, index) => (
+                <section className="about-story-section" key={section.title}>
+                  <div className="about-story-heading">
+                    <span>0{index + 1}</span>
+                    <h2>{section.title}</h2>
+                  </div>
+                  <div className="about-story-copy">
+                    {section.paragraphs.map((paragraph) => (
+                      <p key={paragraph}>{paragraph}</p>
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
+
           </div>
 
-          <div className="space-y-8">
-            <div className="rounded-xl border border-white/[0.06] bg-zinc-900/40 p-5">
-              <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-4">
+          <aside className="about-sidebar">
+            <section className="about-contact-card border p-5">
+              <h2 className="about-sidebar-heading mb-4">
                 Contact
-              </h3>
-              <div className="space-y-3">
+              </h2>
+              <div className="space-y-1">
                 {[
                   {
                     icon: <Mail size={13} />,
@@ -701,6 +720,11 @@ function AboutPage() {
                     href: CONTACT.linkedInUrl,
                   },
                   {
+                    icon: <Github size={13} />,
+                    label: CONTACT.githubLabel,
+                    href: CONTACT.githubUrl,
+                  },
+                  {
                     icon: <MapPin size={13} />,
                     label: CONTACT.location,
                     href: "https://www.google.com/maps/search/?api=1&query=Bengaluru%2C%20India",
@@ -711,20 +735,21 @@ function AboutPage() {
                     href={href}
                     target={href.startsWith("http") ? "_blank" : undefined}
                     rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-                    className="flex items-center gap-2.5 text-xs text-zinc-500 hover:text-zinc-200 transition-colors"
+                    className="about-contact-link"
                   >
-                    <span className="text-zinc-700">{icon}</span>
-                    {label}
+                    <span className="about-contact-icon">{icon}</span>
+                    <span>{label}</span>
+                    <ArrowUpRight size={12} aria-hidden="true" />
                   </a>
                 ))}
               </div>
-            </div>
+            </section>
 
-            <div className="rounded-xl border border-white/[0.06] bg-zinc-900/40 p-5">
-              <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-4">
+            <section className="about-sidebar-card site-card border p-5">
+              <h2 className="about-sidebar-heading mb-4">
                 Experience
-              </h3>
-              <div className="space-y-5 border-l border-white/[0.07] pl-4">
+              </h2>
+              <div className="about-timeline">
                 {[
                   {
                     role: "Deep Learning Performance Engineer II",
@@ -741,9 +766,14 @@ function AboutPage() {
                     place: "NVIDIA, Bengaluru",
                     date: "Jan 2024 - Aug 2024",
                   },
-                ].map((item) => (
-                  <div key={`${item.role}-${item.date}`} className="relative">
-                    <div className="absolute -left-[21px] top-1.5 h-2 w-2 rounded-full bg-zinc-700 ring-4 ring-[#111113]" />
+                ].map((item, index) => (
+                  <div
+                    key={`${item.role}-${item.date}`}
+                    className={`about-timeline-item ${
+                      index === 0 ? "is-current" : ""
+                    }`}
+                  >
+                    <span className="about-timeline-dot" />
                     <p className="text-xs font-semibold text-zinc-300 leading-snug">
                       {item.role}
                     </p>
@@ -756,12 +786,12 @@ function AboutPage() {
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
 
-            <div className="rounded-xl border border-white/[0.06] bg-zinc-900/40 p-5">
-              <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-4">
+            <section className="about-sidebar-card site-card border p-5">
+              <h2 className="about-sidebar-heading mb-4">
                 Education & Achievement
-              </h3>
+              </h2>
               <div className="divide-y divide-white/[0.06]">
                 {[
                   {
@@ -788,12 +818,12 @@ function AboutPage() {
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
 
-            <div className="rounded-xl border border-white/[0.06] bg-zinc-900/40 p-5">
-              <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-4">
+            <section className="about-sidebar-card site-card border p-5">
+              <h2 className="about-sidebar-heading mb-4">
                 Stack
-              </h3>
+              </h2>
               <div className="space-y-5">
                 {[
                   {
@@ -842,8 +872,8 @@ function AboutPage() {
                   </div>
                 ))}
               </div>
-            </div>
-          </div>
+            </section>
+          </aside>
         </div>
       </div>
     </main>
@@ -858,7 +888,13 @@ function WritingsPage({ navigate }: { navigate: (path: string) => void }) {
   const sorted = [...filtered].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
   );
-  const grouped = sorted.reduce<Array<{ year: string; items: Writing[] }>>(
+  const featured = active ? null : sorted[0] ?? null;
+  const archiveItems = featured ? sorted.slice(1) : sorted;
+  const featuredImage =
+    featured?.slug === "cute-layouts"
+      ? hrefFor(`/writings/${featured.slug}/images/svg/06b_layout_algebra_overview.svg`)
+      : null;
+  const archiveGrouped = archiveItems.reduce<Array<{ year: string; items: Writing[] }>>(
     (groups, writing) => {
       const year = new Date(writing.date).getFullYear().toString();
       const group = groups.find((entry) => entry.year === year);
@@ -884,7 +920,7 @@ function WritingsPage({ navigate }: { navigate: (path: string) => void }) {
         <div className="grid lg:grid-cols-[280px_minmax(0,1fr)] gap-10 lg:gap-16 items-start">
           <aside className="lg:sticky lg:top-[88px] space-y-8">
             <div>
-              <p className="text-sm text-blue-400 font-medium mb-3">
+              <p className="text-sm text-amber-400 font-medium mb-3">
                 Writing
               </p>
               <h1 className="font-['Bricolage_Grotesque',sans-serif] text-[2.25rem] font-semibold text-white tracking-tight leading-tight mb-3">
@@ -894,9 +930,27 @@ function WritingsPage({ navigate }: { navigate: (path: string) => void }) {
                 Technical notes on CUDA, GPU architecture, LLM inference,
                 profiling, and performance engineering.
               </p>
+              <div className="grid grid-cols-2 gap-2 mt-5">
+                {[
+                  { label: "Notes", value: writings.length },
+                  { label: "Topics", value: ALL_TAGS.length },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className="site-stat-strip rounded-lg border border-white/[0.06] bg-zinc-900/35 px-3 py-2"
+                  >
+                    <p className="text-lg font-semibold text-zinc-200 leading-none">
+                      {item.value}
+                    </p>
+                    <p className="text-[10px] uppercase tracking-widest text-zinc-700 mt-1.5">
+                      {item.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className="rounded-xl border border-white/[0.06] bg-zinc-900/40 p-4">
+            <div className="site-card rounded-xl border border-white/[0.06] bg-zinc-900/40 p-4">
               <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-4">
                 Topics
               </h2>
@@ -906,7 +960,7 @@ function WritingsPage({ navigate }: { navigate: (path: string) => void }) {
                   onClick={() => setActive(null)}
                   className={`flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
                     active === null
-                      ? "bg-blue-500/15 text-blue-400"
+                      ? "bg-amber-500/15 text-amber-400"
                       : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.04]"
                   }`}
                 >
@@ -921,7 +975,7 @@ function WritingsPage({ navigate }: { navigate: (path: string) => void }) {
                     onClick={() => setActive(active === tag ? null : tag)}
                     className={`flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
                       active === tag
-                        ? "bg-blue-500/15 text-blue-400"
+                        ? "bg-amber-500/15 text-amber-400"
                         : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.04]"
                     }`}
                   >
@@ -951,9 +1005,53 @@ function WritingsPage({ navigate }: { navigate: (path: string) => void }) {
               )}
             </div>
 
-            {grouped.length > 0 ? (
+            {featured && (
+              <a
+                href={hrefFor(`/writings/${featured.slug}/`)}
+                onClick={(event) => {
+                  event.preventDefault();
+                  navigate(`/writings/${featured.slug}/`);
+                }}
+                className="site-feature-card group grid md:grid-cols-[minmax(0,1fr)_280px] gap-0 overflow-hidden rounded-2xl border border-white/[0.07] bg-zinc-900/40 hover:border-white/[0.11] transition-all duration-200 mb-10"
+              >
+                <div className="p-6 sm:p-7">
+                  <div className="flex flex-wrap gap-1.5 mb-5">
+                    {featured.tags.map((tag) => (
+                      <Chip key={tag} label={tag} />
+                    ))}
+                  </div>
+                  <p className="text-xs font-semibold text-amber-400 uppercase tracking-widest mb-3">
+                    Latest note
+                  </p>
+                  <h2 className="text-2xl font-semibold text-zinc-100 group-hover:text-white leading-tight mb-4 transition-colors">
+                    {featured.title}
+                  </h2>
+                  <p className="text-sm text-zinc-500 leading-relaxed mb-6 max-w-[620px]">
+                    {featured.description}
+                  </p>
+                  <div className="flex items-center gap-3 text-xs text-zinc-600">
+                    <span>{fmtDate(featured.date)}</span>
+                    <span>-</span>
+                    <span>{featured.readingTime} min read</span>
+                  </div>
+                </div>
+
+                {featuredImage && (
+                  <div className="hidden md:block border-l border-white/[0.06] bg-white/[0.025] overflow-hidden">
+                    <img
+                      src={featuredImage}
+                      alt=""
+                      className="h-full w-full object-cover object-left-top opacity-90 grayscale-[0.1] group-hover:opacity-100 transition-opacity"
+                      loading="lazy"
+                    />
+                  </div>
+                )}
+              </a>
+            )}
+
+            {archiveGrouped.length > 0 ? (
               <div className="space-y-10">
-                {grouped.map((group) => (
+                {archiveGrouped.map((group) => (
                   <section key={group.year}>
                     <div className="flex items-center gap-3 mb-3">
                       <span className="text-xs font-semibold text-zinc-500 uppercase tracking-widest">
@@ -962,7 +1060,7 @@ function WritingsPage({ navigate }: { navigate: (path: string) => void }) {
                       <div className="h-px flex-1 bg-white/[0.06]" />
                     </div>
 
-                    <div className="rounded-xl border border-white/[0.06] bg-zinc-900/35 overflow-hidden divide-y divide-white/[0.06]">
+                    <div className="site-card rounded-xl border border-white/[0.06] bg-zinc-900/35 overflow-hidden divide-y divide-white/[0.06]">
                       {group.items.map((writing) => (
                         <WritingCard
                           key={writing.slug}
@@ -975,7 +1073,7 @@ function WritingsPage({ navigate }: { navigate: (path: string) => void }) {
                 ))}
               </div>
             ) : (
-              <div className="rounded-xl border border-white/[0.06] bg-zinc-900/35 py-20 text-center text-zinc-600 text-sm">
+              <div className="site-card rounded-xl border border-white/[0.06] bg-zinc-900/35 py-20 text-center text-zinc-600 text-sm">
                 No writings with that topic yet.
               </div>
             )}
@@ -999,9 +1097,88 @@ function ArticlePage({
     articleIndex >= 0 && articleIndex < writings.length - 1
       ? writings[articleIndex + 1]
       : null;
+  const [activeSection, setActiveSection] = useState("top");
+  const [readingProgress, setReadingProgress] = useState(0);
+  const tocListRef = useRef<HTMLUListElement>(null);
+
+  useEffect(() => {
+    const sectionIds = ["top", ...writing.toc.map((item) => item.id)];
+    let animationFrame = 0;
+
+    const updateActiveSection = () => {
+      animationFrame = 0;
+      const activationLine = Math.min(180, window.innerHeight * 0.24);
+      let nextSection = "top";
+
+      for (const sectionId of sectionIds) {
+        const section = document.getElementById(sectionId);
+        if (!section) continue;
+        if (section.getBoundingClientRect().top <= activationLine) {
+          nextSection = sectionId;
+        } else {
+          break;
+        }
+      }
+
+      setActiveSection((current) =>
+        current === nextSection ? current : nextSection,
+      );
+
+      const article = document.getElementById("top");
+      if (article) {
+        const articleTop = window.scrollY + article.getBoundingClientRect().top;
+        const readableDistance = Math.max(
+          article.offsetHeight - window.innerHeight,
+          1,
+        );
+        const nextProgress = Math.round(
+          Math.min(
+            100,
+            Math.max(0, ((window.scrollY - articleTop) / readableDistance) * 100),
+          ),
+        );
+        setReadingProgress((current) =>
+          current === nextProgress ? current : nextProgress,
+        );
+      }
+    };
+
+    const scheduleUpdate = () => {
+      if (!animationFrame) {
+        animationFrame = window.requestAnimationFrame(updateActiveSection);
+      }
+    };
+
+    updateActiveSection();
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
+
+    return () => {
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+      if (animationFrame) window.cancelAnimationFrame(animationFrame);
+    };
+  }, [writing.slug, writing.toc]);
+
+  useEffect(() => {
+    const list = tocListRef.current;
+    const activeLink = list?.querySelector<HTMLElement>(".is-active");
+    if (!list || !activeLink) return;
+
+    const activeTop = activeLink.offsetTop;
+    const activeBottom = activeTop + activeLink.offsetHeight;
+    const visibleTop = list.scrollTop;
+    const visibleBottom = visibleTop + list.clientHeight;
+
+    if (activeTop < visibleTop) {
+      list.scrollTo({ top: Math.max(0, activeTop - 12) });
+    } else if (activeBottom > visibleBottom) {
+      list.scrollTo({ top: activeBottom - list.clientHeight + 12 });
+    }
+  }, [activeSection]);
 
   return (
-    <main className="max-w-[1240px] mx-auto px-5 sm:px-8 lg:px-10">
+    <main className="max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-10">
       <div className="pt-10 pb-24">
         <a
           href={hrefFor("/writings/")}
@@ -1015,117 +1192,132 @@ function ArticlePage({
           Back to writings
         </a>
 
-        <div className="grid lg:grid-cols-[minmax(0,800px)_280px] gap-12 lg:gap-20 items-start">
-          <article className="min-w-0 max-w-[800px]">
-            <header className="mb-9">
-              <div className="flex flex-wrap gap-1.5 mb-5">
-                {writing.tags.map((tag) => (
-                  <Chip key={tag} label={tag} />
-                ))}
+        <div className="grid lg:grid-cols-[minmax(0,880px)_280px] gap-8 lg:gap-10 items-start">
+          <article id="top" className="min-w-0 scroll-mt-24">
+            <div className="article-reading-surface">
+              <header className="mx-auto mb-9 max-w-[760px]">
+                <div className="flex flex-wrap gap-1.5 mb-5">
+                  {writing.tags.map((tag) => (
+                    <Chip key={tag} label={tag} />
+                  ))}
+                </div>
+                <h1 className="font-['Bricolage_Grotesque',sans-serif] text-[2.15rem] sm:text-[2.85rem] font-semibold text-white leading-[1.08] tracking-tight mb-5">
+                  {writing.title}
+                </h1>
+                <p className="text-base text-zinc-500 leading-relaxed mb-5">
+                  {writing.description}
+                </p>
+                <div className="flex items-center gap-3 text-xs text-zinc-600">
+                  <span className="flex items-center gap-1.5">
+                    <Calendar size={11} />
+                    {fmtDate(writing.date)}
+                  </span>
+                  <span>-</span>
+                  <span className="flex items-center gap-1.5">
+                    <Clock size={11} />
+                    {writing.readingTime} min read
+                  </span>
+                </div>
+              </header>
+
+              <div className="mx-auto max-w-[760px]">
+                <Divider />
               </div>
-              <h1 className="font-['Bricolage_Grotesque',sans-serif] text-[2.15rem] sm:text-[2.85rem] font-semibold text-white leading-[1.08] tracking-tight mb-5">
-                {writing.title}
-              </h1>
-              <p className="text-base text-zinc-500 leading-relaxed mb-5 max-w-[760px]">
-                {writing.description}
-              </p>
-              <div className="flex items-center gap-3 text-xs text-zinc-600">
-                <span className="flex items-center gap-1.5">
-                  <Calendar size={11} />
-                  {fmtDate(writing.date)}
-                </span>
-                <span>-</span>
-                <span className="flex items-center gap-1.5">
-                  <Clock size={11} />
-                  {writing.readingTime} min read
-                </span>
-              </div>
-            </header>
 
-            <Divider />
+              <div
+                className="article-body mx-auto mt-9 max-w-[760px] text-[15.5px] text-zinc-400 leading-[1.92]"
+                dangerouslySetInnerHTML={{ __html: writing.bodyHtml }}
+              />
 
-            <div
-              className="article-body mt-9 max-w-[760px] text-[15px] text-zinc-400 leading-[1.9]"
-              dangerouslySetInnerHTML={{ __html: writing.bodyHtml }}
-            />
-
-            <div className="mt-16 pt-8 border-t border-white/[0.06] max-w-[800px]">
-              <div className="grid sm:grid-cols-2 gap-4">
-                {previous ? (
-                  <ArticleNavLink
-                    label="Previous article"
-                    writing={previous}
-                    navigate={navigate}
-                  />
-                ) : (
-                  <div />
-                )}
-                {next ? (
-                  <ArticleNavLink
-                    label="Next article"
-                    writing={next}
-                    navigate={navigate}
-                    align="right"
-                  />
-                ) : (
-                  <div />
-                )}
+              <div className="mx-auto mt-16 max-w-[760px] border-t border-white/[0.06] pt-8">
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {previous ? (
+                    <ArticleNavLink
+                      label="Previous article"
+                      writing={previous}
+                      navigate={navigate}
+                    />
+                  ) : (
+                    <div />
+                  )}
+                  {next ? (
+                    <ArticleNavLink
+                      label="Next article"
+                      writing={next}
+                      navigate={navigate}
+                      align="right"
+                    />
+                  ) : (
+                    <div />
+                  )}
+                </div>
               </div>
             </div>
           </article>
 
-          <aside className="hidden lg:block sticky top-[84px] self-start space-y-4">
-            <div className="rounded-xl border border-white/[0.06] bg-zinc-900/40 p-4">
-              <p className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-4">
-                Article
-              </p>
-              <div className="divide-y divide-white/[0.06]">
-                <div className="grid grid-cols-[76px_minmax(0,1fr)] gap-3 py-2 first:pt-0">
-                  <span className="text-[11px] uppercase tracking-widest text-zinc-700">
-                    Date
-                  </span>
-                  <span className="text-xs text-zinc-500">
-                    {fmtDate(writing.date)}
-                  </span>
-                </div>
-                <div className="grid grid-cols-[76px_minmax(0,1fr)] gap-3 py-2">
-                  <span className="text-[11px] uppercase tracking-widest text-zinc-700">
-                    Read
-                  </span>
-                  <span className="text-xs text-zinc-500">
-                    {writing.readingTime} min
-                  </span>
-                </div>
-                <div className="py-2 last:pb-0">
-                  <span className="block text-[11px] uppercase tracking-widest text-zinc-700 mb-2.5">
-                    Topics
-                  </span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {writing.tags.map((tag) => (
-                      <Chip key={tag} label={tag} />
-                    ))}
+          <aside className="hidden lg:block sticky top-[84px] self-start">
+            {writing.toc.length > 0 && (
+              <div className="site-toc-card overflow-hidden border">
+                <div className="site-toc-header">
+                  <div className="site-toc-title-row">
+                    <p className="site-toc-eyebrow">On this page</p>
+                    <span className="site-toc-percentage">
+                      {readingProgress}%
+                    </span>
+                  </div>
+                  <div
+                    className="site-toc-progress"
+                    role="progressbar"
+                    aria-label="Article reading progress"
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={readingProgress}
+                  >
+                    <span style={{ width: `${readingProgress}%` }} />
+                  </div>
+                  <div className="site-toc-meta">
+                    <span>{writing.readingTime} min read</span>
+                    <span aria-hidden="true">/</span>
+                    <span>{writing.toc.length} sections</span>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            {writing.toc.length > 0 && (
-              <div className="rounded-xl border border-white/[0.06] bg-zinc-900/40 p-4">
-              <p className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-4">
-                On this page
-              </p>
-              <ul className="space-y-1 max-h-[calc(100vh-360px)] overflow-auto pr-1">
-                {writing.toc.map((item) => (
-                  <li key={item.id}>
-                    <a
-                      href={`#${item.id}`}
-                      className="block w-full text-left text-xs py-1 px-2 rounded-md transition-colors leading-relaxed text-zinc-600 hover:text-zinc-300 hover:bg-white/[0.03]"
-                    >
-                      {item.title}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+                <nav className="site-toc-nav" aria-label="Article sections">
+                  <ul ref={tocListRef} className="site-toc-list">
+                    <li className="site-toc-item site-toc-item-level-2">
+                      <a
+                        href="#top"
+                        className={`site-toc-link site-toc-level-2 ${
+                          activeSection === "top" ? "is-active" : ""
+                        }`}
+                        aria-current={
+                          activeSection === "top" ? "location" : undefined
+                        }
+                        onClick={() => setActiveSection("top")}
+                      >
+                        Overview
+                      </a>
+                    </li>
+                    {writing.toc.map((item) => (
+                      <li
+                        key={item.id}
+                        className={`site-toc-item site-toc-item-level-${item.level}`}
+                      >
+                        <a
+                          href={`#${item.id}`}
+                          className={`site-toc-link site-toc-level-${item.level} ${
+                            activeSection === item.id ? "is-active" : ""
+                          }`}
+                          aria-current={
+                            activeSection === item.id ? "location" : undefined
+                          }
+                          onClick={() => setActiveSection(item.id)}
+                        >
+                          {item.title}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
               </div>
             )}
           </aside>
@@ -1155,7 +1347,7 @@ function ArticleNavLink({
         event.preventDefault();
         navigate(path);
       }}
-      className={`group rounded-xl border border-white/[0.06] bg-zinc-900/35 hover:bg-zinc-900/65 hover:border-white/[0.10] p-4 transition-all ${
+      className={`site-card site-card-interactive group rounded-xl border border-white/[0.06] bg-zinc-900/35 hover:bg-zinc-900/65 hover:border-white/[0.10] p-4 transition-all ${
         align === "right" ? "text-right" : "text-left"
       }`}
     >
@@ -1176,7 +1368,7 @@ function NotFoundPage({ navigate }: { navigate: (path: string) => void }) {
   return (
     <main className="max-w-[1240px] mx-auto px-5 sm:px-8 lg:px-10">
       <section className="min-h-[60vh] pt-20 pb-24">
-        <p className="text-sm text-blue-400 font-medium mb-3">404</p>
+        <p className="text-sm text-amber-400 font-medium mb-3">404</p>
         <h1 className="font-['Bricolage_Grotesque',sans-serif] text-[2.25rem] font-semibold text-white tracking-tight leading-tight mb-4">
           Page not found
         </h1>
@@ -1190,7 +1382,7 @@ function NotFoundPage({ navigate }: { navigate: (path: string) => void }) {
             event.preventDefault();
             navigate("/");
           }}
-          className="inline-flex items-center gap-2 rounded-lg bg-white/[0.06] border border-white/[0.08] hover:bg-white/[0.09] hover:border-white/[0.13] px-4 py-2.5 text-sm font-medium text-zinc-300 hover:text-white transition-all duration-150"
+          className="site-primary-action inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-all duration-150"
         >
           Back home
           <ArrowRight size={14} />
@@ -1227,6 +1419,9 @@ export default function App() {
     root.classList.toggle("light", theme === "light");
     root.classList.toggle("dark", theme === "dark");
     window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute("content", theme === "dark" ? "#171816" : "#e8e7e0");
   }, [theme]);
 
   useEffect(() => {
@@ -1263,7 +1458,7 @@ export default function App() {
         toggleTheme={toggleTheme}
       />
       {route.kind === "home" && <HomePage navigate={navigate} />}
-      {route.kind === "about" && <AboutPage />}
+      {route.kind === "about" && <AboutPage navigate={navigate} />}
       {route.kind === "writings" && <WritingsPage navigate={navigate} />}
       {route.kind === "article" && currentWriting && (
         <ArticlePage writing={currentWriting} navigate={navigate} />

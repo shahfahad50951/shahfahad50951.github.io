@@ -11,6 +11,7 @@ src/content/generated/
 extra/
 publish/
 .figma-make-export/
+src/content/writings/cute-layouts/images/png/
 *.zip
 
 # Environment files

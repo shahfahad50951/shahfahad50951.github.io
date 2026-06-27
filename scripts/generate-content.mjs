@@ -146,11 +146,16 @@ function createRenderer(toc) {
     const inline = tokens[index + 1];
     const title = unescapeMarkdownText(inline?.content ?? "");
     const id = uniqueSlug(title, seenHeadings);
+    const level = Number(token.tag.slice(1));
 
     token.attrSet("id", id);
 
-    if (token.tag === "h2" && title.toLowerCase() !== "table of contents") {
-      toc.push({ id, title });
+    if (
+      level >= 2 &&
+      level <= 4 &&
+      title.toLowerCase() !== "table of contents"
+    ) {
+      toc.push({ id, title, level });
     }
 
     return self.renderToken(tokens, index, options);
